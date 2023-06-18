@@ -12,7 +12,7 @@ def connect_to_db():
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="1062@lbn",
+            password="password",
             database="students"
         )
         print("Connected to the MySQL database!")
