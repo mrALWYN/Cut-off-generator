@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[7]:
 
 
 import mysql.connector
 from tabulate import tabulate
+import csv
 
 def connect_to_db():
     try:
         conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="password",
+            password="1062@lbn",
             database="students"
         )
         print("Connected to the MySQL database!")
@@ -61,19 +62,30 @@ def print_cutoff_list(cutoff_list):
     print("Cutoff List:")
     print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
+def download_cutoff_list_csv(cutoff_list):
+    headers = ["Student ID", "Name", "Total Percentage", "Reservation Category"]
+    rows = [[student[0], student[1], student[-2], student[-1]] for student in cutoff_list]
+    file_name = "cutoff_list.csv"
+
+    with open(file_name, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(rows)
+
+    print(f"CSV file '{file_name}' has been created successfully.")
 
 def main():
     connection = connect_to_db()
 
     if connection:
-        merit_pct = float(input("Enter the cutoff percentage for merit category: "))
-        sc_pct = float(input("Enter the cutoff percentage for SC category: "))
-        st_pct = float(input("Enter the cutoff percentage for ST category: "))
-        ews_pct = float(input("Enter the cutoff percentage for EWS category: "))
-        merit_count = int(input("Enter the number of students to include from merit category: "))
-        sc_count = int(input("Enter the number of students to include from SC category: "))
-        st_count = int(input("Enter the number of students to include from ST category: "))
-        ews_count = int(input("Enter the number of students to include from EWS category: "))
+        merit_pct = float(input("Enter the cutoff percentage for the merit category: "))
+        sc_pct = float(input("Enter the cutoff percentage for the SC category: "))
+        st_pct = float(input("Enter the cutoff percentage for the ST category: "))
+        ews_pct = float(input("Enter the cutoff percentage for the EWS category: "))
+        merit_count = int(input("Enter the number of students to include from the merit category: "))
+        sc_count = int(input("Enter the number of students to include from the SC category: "))
+        st_count = int(input("Enter the number of students to include from the ST category: "))
+        ews_count = int(input("Enter the number of students to include from the EWS category: "))
 
         cutoff_list = generate_cutoff_list(
             connection,
@@ -88,6 +100,10 @@ def main():
         )
 
         print_cutoff_list(cutoff_list)
+
+        option = input("Do you want to download the cutoff list as a CSV file? (yes/no): ")
+        if option.lower() == "yes":
+            download_cutoff_list_csv(cutoff_list)
 
         connection.close()
 
